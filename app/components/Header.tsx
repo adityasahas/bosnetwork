@@ -2,17 +2,27 @@
 
 interface HeaderProps {
   founderCount: number;
+  onHomeClick?: () => void;
 }
 
-export default function Header({ founderCount }: HeaderProps) {
+export default function Header({ founderCount, onHomeClick }: HeaderProps) {
   return (
     <header className="px-6 py-5 md:px-10">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex flex-col gap-1">
           <div className="text-left">
-            <h1 className="text-base md:text-lg font-bold tracking-tight text-foreground">
-              bos.network
-            </h1>
+            {onHomeClick ? (
+              <button
+                onClick={onHomeClick}
+                className="text-base md:text-lg font-bold tracking-tight text-foreground hover:text-accent transition-colors"
+              >
+                bos.network
+              </button>
+            ) : (
+              <h1 className="text-base md:text-lg font-bold tracking-tight text-foreground">
+                bos.network
+              </h1>
+            )}
           </div>
           <p className="text-muted text-[11px] tracking-wide">
             {founderCount} founders

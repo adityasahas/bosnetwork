@@ -63,14 +63,27 @@ export default function Directory({ founders }: DirectoryProps) {
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(196,30,58,0.04)_0%,transparent_70%)] pointer-events-none" />
 
       <div className="relative z-10">
-        <Header founderCount={founders.length} />
+        <Header
+          founderCount={founders.length}
+          onHomeClick={
+            selectedFounder ? () => setSelectedFounder(null) : undefined
+          }
+        />
 
         {selectedFounder ? (
-          <main className="max-w-3xl mx-auto px-6 py-8 md:px-10">
-            <FounderDetail
-              founder={selectedFounder}
-              onClose={() => setSelectedFounder(null)}
-            />
+          <main
+            className="px-6 py-8 md:px-10"
+            onClick={() => setSelectedFounder(null)}
+          >
+            <div
+              className="max-w-3xl mx-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <FounderDetail
+                founder={selectedFounder}
+                onClose={() => setSelectedFounder(null)}
+              />
+            </div>
           </main>
         ) : (
           <main className="max-w-6xl mx-auto px-6 py-6 md:px-10 md:py-8">

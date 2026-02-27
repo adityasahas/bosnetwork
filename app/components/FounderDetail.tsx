@@ -70,9 +70,11 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
       <div className="flex items-center justify-end mb-5">
         <button
           onClick={onClose}
-          className="text-[10px] text-muted hover:text-accent transition-colors"
+          aria-label="Close profile"
+          className="h-8 px-3 text-[11px] border border-border rounded-sm text-muted hover:text-foreground hover:border-border-active transition-colors inline-flex items-center gap-2"
         >
-          Close
+          <span>Close</span>
+          <span className="text-[13px] leading-none">×</span>
         </button>
       </div>
 
