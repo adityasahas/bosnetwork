@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
+import { EnvelopeSimpleIcon, LinkSimpleIcon } from "@phosphor-icons/react";
 import type { Founder } from "@/lib/types";
 import StartupLogo from "./StartupLogo";
 
@@ -48,9 +49,9 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-foreground hover:text-accent transition-colors underline underline-offset-2 decoration-border"
+          className="text-foreground hover:text-accent transition-colors underline underline-offset-2 decoration-border inline-flex items-center gap-1"
         >
-          {label}
+          {label} <LinkSimpleIcon size={12} />
         </a>
       );
 
@@ -121,9 +122,9 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
                   href={founder.startup_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-secondary hover:text-accent transition-colors"
+                  className="text-secondary hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
-                  {founder.startup_name}
+                  {founder.startup_name} <LinkSimpleIcon size={12} />
                 </a>
               ) : (
                 <span className="text-secondary">{founder.startup_name}</span>
@@ -154,18 +155,18 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
             <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted">
               <a
                 href={`mailto:${founder.email}`}
-                className="text-secondary hover:text-accent transition-colors"
+                className="text-secondary hover:text-accent transition-colors inline-flex items-center gap-1"
               >
-                {founder.email}
+                {founder.email} <EnvelopeSimpleIcon size={12} />
               </a>
               {founder.portfolio_url && (
                 <a
                   href={founder.portfolio_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
-                  Portfolio
+                  Portfolio <LinkSimpleIcon size={12} />
                 </a>
               )}
               {founder.linkedin_url && (
@@ -173,9 +174,9 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
                   href={founder.linkedin_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
-                  LinkedIn
+                  LinkedIn <LinkSimpleIcon size={12} />
                 </a>
               )}
               {founder.github_url && (
@@ -183,9 +184,9 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
                   href={founder.github_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
                 >
-                  GitHub
+                  GitHub <LinkSimpleIcon size={12} />
                 </a>
               )}
             </div>
