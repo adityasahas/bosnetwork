@@ -13,6 +13,14 @@ interface DirectoryProps {
 }
 
 export default function Directory({ founders }: DirectoryProps) {
+  const getValidClubs = (clubs: unknown): string[] => {
+    if (!Array.isArray(clubs)) return [];
+    return clubs.filter(
+      (club): club is string =>
+        typeof club === "string" && club.trim().length > 0
+    );
+  };
+
   const [search, setSearch] = useState("");
   const [collegeFilter, setCollegeFilter] = useState<string | null>(null);
   const [clubFilter, setClubFilter] = useState<string | null>(null);
@@ -23,7 +31,7 @@ export default function Directory({ founders }: DirectoryProps) {
     [founders]
   );
   const clubs = useMemo(() => {
-    const allClubs = founders.flatMap((f) => f.clubs);
+    const allClubs = founders.flatMap((f) => getValidClubs(f.clubs));
     return [...new Set(allClubs)].sort();
   }, [founders]);
 
@@ -35,7 +43,7 @@ export default function Directory({ founders }: DirectoryProps) {
           f.name,
           f.college,
           f.startup_name,
-          ...f.clubs,
+          ...getValidClubs(f.clubs),
           f.bio || "",
         ]
           .join(" ")
@@ -43,7 +51,7 @@ export default function Directory({ founders }: DirectoryProps) {
         if (!searchable.includes(q)) return false;
       }
       if (collegeFilter && f.college !== collegeFilter) return false;
-      if (clubFilter && !f.clubs.includes(clubFilter)) return false;
+      if (clubFilter && !getValidClubs(f.clubs).includes(clubFilter)) return false;
       return true;
     });
   }, [founders, search, collegeFilter, clubFilter]);

@@ -12,6 +12,11 @@ interface FounderDetailProps {
 }
 
 export default function FounderDetail({ founder, onClose }: FounderDetailProps) {
+  const clubs = (Array.isArray(founder.clubs) ? founder.clubs : []).filter(
+    (club): club is string =>
+      typeof club === "string" && club.trim().length > 0
+  );
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -123,9 +128,9 @@ export default function FounderDetail({ founder, onClose }: FounderDetailProps) 
               )}
             </div>
 
-            {founder.clubs.length > 0 && (
+            {clubs.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {founder.clubs.map((club) => (
+                {clubs.map((club) => (
                   <span
                     key={club}
                     className="text-[9px] tracking-wide text-muted"

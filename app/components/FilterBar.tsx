@@ -38,7 +38,9 @@ export default function FilterBar({
       </div>
 
       <div className="flex gap-1.5 flex-wrap">
-        {clubs.map((club) => (
+        {clubs
+          .filter((club): club is string => typeof club === "string" && club.trim().length > 0)
+          .map((club) => (
           <button
             key={club}
             onClick={() => onClubFilter(activeClub === club ? null : club)}

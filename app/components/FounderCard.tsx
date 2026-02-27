@@ -11,6 +11,11 @@ interface FounderCardProps {
 }
 
 export default function FounderCard({ founder, index, onSelect }: FounderCardProps) {
+  const clubs = (Array.isArray(founder.clubs) ? founder.clubs : []).filter(
+    (club): club is string =>
+      typeof club === "string" && club.trim().length > 0
+  );
+
   return (
     <div
       className="animate-fade-up group border border-border hover:border-border-active bg-surface/50 hover:bg-surface transition-all cursor-pointer"
@@ -78,9 +83,9 @@ export default function FounderCard({ founder, index, onSelect }: FounderCardPro
               )}
             </div>
 
-            {founder.clubs.length > 0 && (
+            {clubs.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {founder.clubs.map((club) => (
+                {clubs.map((club) => (
                   <span
                     key={club}
                     className="text-[9px] tracking-wide text-muted"
