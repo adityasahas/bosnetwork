@@ -6,7 +6,7 @@ import gsap from "gsap";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
 import FilterBar from "./FilterBar";
-import FounderCard from "./FounderCard";
+import FounderCard, { TABLE_COLS } from "./FounderCard";
 import type { Founder } from "@/lib/types";
 
 gsap.registerPlugin(useGSAP);
@@ -93,7 +93,7 @@ export default function Directory({ founders }: DirectoryProps) {
 
         {/* Table */}
         {/* Column header — must use same grid-cols as FounderCard rows */}
-        <div className="grid grid-cols-[32%_22%_32%_14%] border-t border-b border-border py-2 text-xs text-muted uppercase tracking-wider">
+        <div className={`grid ${TABLE_COLS} border-t border-b border-border py-2 text-xs text-muted uppercase tracking-wider`}>
           <div className="pr-4">name</div>
           <div className="pr-4">college</div>
           <div className="pr-4">building</div>
