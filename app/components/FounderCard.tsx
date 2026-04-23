@@ -8,7 +8,7 @@ import StartupLogo from "./StartupLogo";
 import { getCollegeAbbr } from "@/lib/colleges";
 
 // Must match TABLE_COLS in Directory.tsx
-export const TABLE_COLS = "grid-cols-[28%_15%_33%_24%] md:grid-cols-[32%_22%_32%_14%]";
+export const TABLE_COLS = "grid-cols-[28%_19%_33%_20%] md:grid-cols-[32%_22%_32%_14%]";
 
 interface FounderCardProps {
   founder: Founder;
