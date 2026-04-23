@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Founder } from "@/lib/types";
 import StartupLogo from "./StartupLogo";
 import { toSlug } from "@/lib/slugs";
+import { getCollegeAbbr } from "@/lib/colleges";
 
 interface FounderCardProps {
   founder: Founder;
@@ -54,7 +55,8 @@ export default function FounderCard({ founder }: FounderCardProps) {
 
       {/* College */}
       <div className="relative py-3 pr-4 text-secondary text-sm truncate pointer-events-none">
-        {founder.college}
+        <span className="hidden md:inline">{founder.college}</span>
+        <span className="md:hidden">{getCollegeAbbr(founder.college)}</span>
         {founder.graduation_year && (
           <span className="text-muted">
             {" "}&apos;{String(founder.graduation_year).slice(-2)}

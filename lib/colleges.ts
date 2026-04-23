@@ -12,6 +12,30 @@ const COLOR_MAP: [string, string][] = [
   ["olin", "#FF7043"],
 ];
 
+const ABBR_MAP: [string, string][] = [
+  ["massachusetts institute", "MIT"],
+  [" mit ", "MIT"],
+  ["harvard", "Harvard"],
+  ["northeastern", "NEU"],
+  ["boston university", "BU"],
+  [" bu ", "BU"],
+  ["boston college", "BC"],
+  [" bc ", "BC"],
+  ["tufts", "Tufts"],
+  ["wellesley", "Wellesley"],
+  ["babson", "Babson"],
+  ["olin", "Olin"],
+];
+
+export function getCollegeAbbr(college: string): string {
+  const lower = ` ${college.toLowerCase()} `;
+  for (const [key, abbr] of ABBR_MAP) {
+    if (lower.includes(key)) return abbr;
+  }
+  // Fall back to first word if no match
+  return college.split(" ")[0];
+}
+
 export function getCollegeColor(college: string): string {
   const lower = ` ${college.toLowerCase()} `;
   for (const [key, color] of COLOR_MAP) {
