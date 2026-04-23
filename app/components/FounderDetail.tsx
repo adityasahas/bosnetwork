@@ -1,19 +1,39 @@
 "use client";
 
+import { useRef } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import { ArrowLeftIcon, LinkSimpleIcon } from "@phosphor-icons/react";
 import type { Founder } from "@/lib/types";
 import StartupLogo from "./StartupLogo";
+
+gsap.registerPlugin(useGSAP);
 
 interface FounderDetailProps {
   founder: Founder;
 }
 
 export default function FounderDetail({ founder }: FounderDetailProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const clubs = (Array.isArray(founder.clubs) ? founder.clubs : []).filter(
     (c): c is string => typeof c === "string" && c.trim().length > 0
+  );
+
+  useGSAP(
+    () => {
+      gsap.from(".detail-item", {
+        autoAlpha: 0,
+        y: 10,
+        stagger: 0.07,
+        duration: 0.45,
+        ease: "power2.out",
+      });
+    },
+    { scope: containerRef }
   );
 
   const renderBio = (bio: string): ReactNode[] => {
@@ -42,17 +62,18 @@ export default function FounderDetail({ founder }: FounderDetailProps) {
   };
 
   return (
-    <div>
+    <div ref={containerRef}>
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors mb-8 group"
+        className="detail-item inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors mb-8 group"
       >
         <ArrowLeftIcon size={14} className="transition-transform group-hover:-translate-x-0.5" />
         back
       </Link>
 
       <div className="flex gap-6 items-start flex-col sm:flex-row">
-        <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden bg-surface">
+        {/* Avatar */}
+        <div className="detail-item shrink-0 w-20 h-20 rounded-full overflow-hidden bg-surface">
           {founder.headshot_url ? (
             <Image
               src={founder.headshot_url}
@@ -70,14 +91,18 @@ export default function FounderDetail({ founder }: FounderDetailProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-semibold text-foreground">{founder.name}</h1>
-          <p className="text-secondary text-sm mt-0.5">
-            {founder.college}
-            {founder.graduation_year &&
-              ` · class of '${String(founder.graduation_year).slice(-2)}`}
-          </p>
+          {/* Name + college */}
+          <div className="detail-item">
+            <h1 className="text-2xl font-semibold text-foreground">{founder.name}</h1>
+            <p className="text-secondary text-sm mt-0.5">
+              {founder.college}
+              {founder.graduation_year &&
+                ` · class of '${String(founder.graduation_year).slice(-2)}`}
+            </p>
+          </div>
 
-          <div className="mt-4 flex items-center gap-2">
+          {/* Startup */}
+          <div className="detail-item mt-4 flex items-center gap-2">
             {founder.startup_logo_url && (
               <StartupLogo src={founder.startup_logo_url} alt={founder.startup_name} size="md" />
             )}
@@ -96,8 +121,9 @@ export default function FounderDetail({ founder }: FounderDetailProps) {
             )}
           </div>
 
+          {/* Clubs */}
           {clubs.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
+            <div className="detail-item flex flex-wrap gap-1.5 mt-3">
               {clubs.map((club) => (
                 <span
                   key={club}
@@ -109,13 +135,15 @@ export default function FounderDetail({ founder }: FounderDetailProps) {
             </div>
           )}
 
+          {/* Bio */}
           {founder.bio && (
-            <p className="mt-4 text-secondary text-sm leading-relaxed">
+            <p className="detail-item mt-4 text-secondary text-sm leading-relaxed">
               {renderBio(founder.bio)}
             </p>
           )}
 
-          <div className="mt-5 pt-5 border-t border-border flex flex-wrap gap-4 text-sm text-secondary">
+          {/* Links */}
+          <div className="detail-item mt-5 pt-5 border-t border-border flex flex-wrap gap-4 text-sm text-secondary">
             <a
               href={`mailto:${founder.email}`}
               className="hover:text-foreground transition-colors hover:underline underline-offset-2"
