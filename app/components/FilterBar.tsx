@@ -17,43 +17,51 @@ export default function FilterBar({
   onCollegeFilter,
   onClubFilter,
 }: FilterBarProps) {
+  const validClubs = clubs.filter(
+    (c): c is string => typeof c === "string" && c.trim().length > 0
+  );
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="space-y-2 mt-4">
       <div className="flex gap-1.5 flex-wrap">
-        {colleges.map((college) => (
-          <button
-            key={college}
-            onClick={() =>
-              onCollegeFilter(activeCollege === college ? null : college)
-            }
-            className={`text-[10px] tracking-wide px-2 py-0.5 border transition-all ${
-              activeCollege === college
-                ? "border-accent text-accent bg-accent/5"
-                : "border-border text-secondary hover:border-border-active hover:text-foreground"
-            }`}
-          >
-            {college}
-          </button>
-        ))}
+        {colleges.map((college) => {
+          const active = activeCollege === college;
+          return (
+            <button
+              key={college}
+              onClick={() => onCollegeFilter(active ? null : college)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                active
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border text-secondary hover:border-border-hi hover:text-foreground"
+              }`}
+            >
+              {college}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex gap-1.5 flex-wrap">
-        {clubs
-          .filter((club): club is string => typeof club === "string" && club.trim().length > 0)
-          .map((club) => (
-          <button
-            key={club}
-            onClick={() => onClubFilter(activeClub === club ? null : club)}
-            className={`text-[10px] tracking-wide px-2 py-0.5 border transition-all ${
-              activeClub === club
-                ? "border-accent text-accent bg-accent/5"
-                : "border-border text-secondary hover:border-border-active hover:text-foreground"
-            }`}
-          >
-            {club.toLowerCase().replace(/\s+/g, "_")}
-          </button>
-        ))}
-      </div>
+      {validClubs.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap">
+          {validClubs.map((club) => {
+            const active = activeClub === club;
+            return (
+              <button
+                key={club}
+                onClick={() => onClubFilter(active ? null : club)}
+                className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                  active
+                    ? "bg-foreground text-background border-foreground"
+                    : "border-border text-muted hover:border-border-hi hover:text-secondary"
+                }`}
+              >
+                {club}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

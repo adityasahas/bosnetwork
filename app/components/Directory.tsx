@@ -1,54 +1,58 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
 import FilterBar from "./FilterBar";
 import FounderCard from "./FounderCard";
-import FounderDetail from "./FounderDetail";
 import type { Founder } from "@/lib/types";
+
+gsap.registerPlugin(useGSAP);
 
 interface DirectoryProps {
   founders: Founder[];
 }
 
-export default function Directory({ founders }: DirectoryProps) {
-  const getValidClubs = (clubs: unknown): string[] => {
-    if (!Array.isArray(clubs)) return [];
-    return clubs.filter(
-      (club): club is string =>
-        typeof club === "string" && club.trim().length > 0
-    );
-  };
+function getValidClubs(clubs: unknown): string[] {
+  if (!Array.isArray(clubs)) return [];
+  return clubs.filter(
+    (c): c is string => typeof c === "string" && c.trim().length > 0
+  );
+}
 
+export default function Directory({ founders }: DirectoryProps) {
   const [search, setSearch] = useState("");
   const [collegeFilter, setCollegeFilter] = useState<string | null>(null);
   const [clubFilter, setClubFilter] = useState<string | null>(null);
-  const [selectedFounder, setSelectedFounder] = useState<Founder | null>(null);
+
+  const listRef = useRef<HTMLDivElement>(null);
 
   const colleges = useMemo(
     () => [...new Set(founders.map((f) => f.college))].sort(),
     [founders]
   );
+
   const clubs = useMemo(() => {
-    const allClubs = founders.flatMap((f) => getValidClubs(f.clubs));
-    return [...new Set(allClubs)].sort();
+    const all = founders.flatMap((f) => getValidClubs(f.clubs));
+    return [...new Set(all)].sort();
   }, [founders]);
 
   const filtered = useMemo(() => {
     return founders.filter((f) => {
       if (search) {
         const q = search.toLowerCase();
-        const searchable = [
+        const hay = [
           f.name,
           f.college,
           f.startup_name,
           ...getValidClubs(f.clubs),
-          f.bio || "",
+          f.bio ?? "",
         ]
           .join(" ")
           .toLowerCase();
-        if (!searchable.includes(q)) return false;
+        if (!hay.includes(q)) return false;
       }
       if (collegeFilter && f.college !== collegeFilter) return false;
       if (clubFilter && !getValidClubs(f.clubs).includes(clubFilter)) return false;
@@ -56,73 +60,61 @@ export default function Directory({ founders }: DirectoryProps) {
     });
   }, [founders, search, collegeFilter, clubFilter]);
 
+  useGSAP(
+    () => {
+      gsap.fromTo(
+        ".founder-card",
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, stagger: 0.02, duration: 0.3, ease: "power2.out" }
+      );
+    },
+    { scope: listRef, dependencies: [filtered], revertOnUpdate: true }
+  );
+
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="fixed inset-0 grid-bg opacity-30 pointer-events-none" />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto px-6 md:px-10">
 
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_center,rgba(196,30,58,0.04)_0%,transparent_70%)] pointer-events-none" />
+        {/* Two-column header */}
+        <div className="grid md:grid-cols-2 gap-10 md:gap-16 pt-12 pb-10">
+          <Header founderCount={founders.length} />
+          <div className="flex flex-col justify-end">
+            <SearchBar value={search} onChange={setSearch} />
+            <FilterBar
+              colleges={colleges}
+              clubs={clubs}
+              activeCollege={collegeFilter}
+              activeClub={clubFilter}
+              onCollegeFilter={setCollegeFilter}
+              onClubFilter={setClubFilter}
+            />
+          </div>
+        </div>
 
-      <div className="relative z-10">
-        <Header
-          founderCount={founders.length}
-          onHomeClick={
-            selectedFounder ? () => setSelectedFounder(null) : undefined
-          }
-        />
+        {/* Table */}
+        {/* Column header — must use same grid-cols as FounderCard rows */}
+        <div className="grid grid-cols-[32%_22%_32%_14%] border-t border-b border-border py-2 text-xs text-muted uppercase tracking-wider">
+          <div className="pr-4">name</div>
+          <div className="pr-4">college</div>
+          <div className="pr-4">building</div>
+          <div>links</div>
+        </div>
 
-        {selectedFounder ? (
-          <main
-            className="px-6 py-8 md:px-10"
-            onClick={() => setSelectedFounder(null)}
-          >
-            <div
-              className="max-w-3xl mx-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <FounderDetail
-                founder={selectedFounder}
-                onClose={() => setSelectedFounder(null)}
-              />
+        <div ref={listRef}>
+          {filtered.length > 0 ? (
+            filtered.map((founder, i) => (
+              <FounderCard key={founder.id} founder={founder} index={i} />
+            ))
+          ) : (
+            <div className="py-16 text-center text-muted text-sm">
+              no results
             </div>
-          </main>
-        ) : (
-          <main className="max-w-6xl mx-auto px-6 py-6 md:px-10 md:py-8">
-            <div className="space-y-4 mb-8">
-              <SearchBar value={search} onChange={setSearch} />
-              <FilterBar
-                colleges={colleges}
-                clubs={clubs}
-                activeCollege={collegeFilter}
-                activeClub={clubFilter}
-                onCollegeFilter={setCollegeFilter}
-                onClubFilter={setClubFilter}
-              />
-            </div>
+          )}
+        </div>
 
-            {filtered.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filtered.map((founder, i) => (
-                  <FounderCard
-                    key={founder.id}
-                    founder={founder}
-                    index={i}
-                    onSelect={setSelectedFounder}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16">
-                <p className="text-muted text-[11px]">No results found.</p>
-              </div>
-            )}
-
-            <footer className="mt-16 pt-6 border-t border-border text-center">
-              <p className="text-muted text-[10px] tracking-wide">
-                made by student founders, for student founders.
-              </p>
-            </footer>
-          </main>
-        )}
+        <footer className="py-10 text-muted text-xs">
+          made by student founders, for student founders.
+        </footer>
       </div>
     </div>
   );

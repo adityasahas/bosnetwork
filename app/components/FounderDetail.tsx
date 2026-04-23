@@ -1,195 +1,157 @@
 "use client";
 
-import { useEffect } from "react";
 import type { ReactNode } from "react";
 import Image from "next/image";
-import { EnvelopeSimpleIcon, LinkSimpleIcon } from "@phosphor-icons/react";
+import Link from "next/link";
+import { ArrowLeftIcon, LinkSimpleIcon } from "@phosphor-icons/react";
 import type { Founder } from "@/lib/types";
 import StartupLogo from "./StartupLogo";
 
 interface FounderDetailProps {
   founder: Founder;
-  onClose: () => void;
 }
 
-export default function FounderDetail({ founder, onClose }: FounderDetailProps) {
+export default function FounderDetail({ founder }: FounderDetailProps) {
   const clubs = (Array.isArray(founder.clubs) ? founder.clubs : []).filter(
-    (club): club is string =>
-      typeof club === "string" && club.trim().length > 0
+    (c): c is string => typeof c === "string" && c.trim().length > 0
   );
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  const renderBioWithLinks = (bio: string) => {
+  const renderBio = (bio: string): ReactNode[] => {
     const nodes: ReactNode[] = [];
-    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
-    let lastIndex = 0;
-    let match = linkRegex.exec(bio);
-
-    while (match) {
-      const [fullMatch, label, url] = match;
-      const matchIndex = match.index;
-
-      if (matchIndex > lastIndex) {
-        nodes.push(bio.slice(lastIndex, matchIndex));
-      }
-
+    const re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+    let last = 0;
+    let m = re.exec(bio);
+    while (m) {
+      if (m.index > last) nodes.push(bio.slice(last, m.index));
       nodes.push(
         <a
-          key={`${label}-${url}-${matchIndex}`}
-          href={url}
+          key={`${m[1]}-${m.index}`}
+          href={m[2]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-foreground hover:text-accent transition-colors underline underline-offset-2 decoration-border inline-flex items-center gap-1"
+          className="underline underline-offset-2 hover:text-foreground transition-colors inline-flex items-center gap-0.5"
         >
-          {label} <LinkSimpleIcon size={12} />
+          {m[1]} <LinkSimpleIcon size={11} />
         </a>
       );
-
-      lastIndex = matchIndex + fullMatch.length;
-      match = linkRegex.exec(bio);
+      last = m.index + m[0].length;
+      m = re.exec(bio);
     }
-
-    if (lastIndex < bio.length) {
-      nodes.push(bio.slice(lastIndex));
-    }
-
+    if (last < bio.length) nodes.push(bio.slice(last));
     return nodes;
   };
 
   return (
-    <div className="animate-fade-up">
-      <div className="flex items-center justify-end mb-5">
-        <button
-          onClick={onClose}
-          aria-label="Close profile"
-          className="h-8 px-3 text-[11px] border border-border rounded-sm text-muted hover:text-foreground hover:border-border-active transition-colors inline-flex items-center gap-2"
-        >
-          <span>Close</span>
-          <span className="text-[13px] leading-none">×</span>
-        </button>
-      </div>
+    <div>
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-sm text-secondary hover:text-foreground transition-colors mb-8 group"
+      >
+        <ArrowLeftIcon size={14} className="transition-transform group-hover:-translate-x-0.5" />
+        back
+      </Link>
 
-      <div className="flex gap-6 flex-col md:flex-row">
-        <div className="shrink-0">
-          <div className="w-24 h-24 md:w-32 md:h-32 border border-accent/40 overflow-hidden">
-            {founder.headshot_url ? (
-              <Image
-                src={founder.headshot_url}
-                alt={founder.name}
-                width={128}
-                height={128}
-                sizes="(min-width: 768px) 128px, 96px"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-elevated flex items-center justify-center text-muted text-lg">
-                ?
-              </div>
-            )}
-          </div>
+      <div className="flex gap-6 items-start flex-col sm:flex-row">
+        <div className="shrink-0 w-20 h-20 rounded-full overflow-hidden bg-surface">
+          {founder.headshot_url ? (
+            <Image
+              src={founder.headshot_url}
+              alt={founder.name}
+              width={80}
+              height={80}
+              sizes="80px"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-secondary text-xl font-medium">
+              {founder.name[0]}
+            </div>
+          )}
         </div>
 
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground">{founder.name}</h1>
-          <p className="text-muted text-[12px] mt-1">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl font-semibold text-foreground">{founder.name}</h1>
+          <p className="text-secondary text-sm mt-0.5">
             {founder.college}
-            {founder.graduation_year && (
-              <> &apos;{String(founder.graduation_year).slice(-2)}</>
-            )}
+            {founder.graduation_year &&
+              ` · class of '${String(founder.graduation_year).slice(-2)}`}
           </p>
 
-          <div className="mt-4 space-y-3">
-            <div className="flex items-center gap-2 text-[12px]">
-              {founder.startup_logo_url && (
-                <StartupLogo
-                  src={founder.startup_logo_url}
-                  alt={founder.startup_name}
-                  size="md"
-                />
-              )}
-              {founder.startup_url ? (
-                <a
-                  href={founder.startup_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-secondary hover:text-accent transition-colors inline-flex items-center gap-1"
-                >
-                  {founder.startup_name} <LinkSimpleIcon size={12} />
-                </a>
-              ) : (
-                <span className="text-secondary">{founder.startup_name}</span>
-              )}
-            </div>
-
-            {clubs.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {clubs.map((club) => (
-                  <span
-                    key={club}
-                    className="text-[9px] tracking-wide text-muted"
-                  >
-                    <span className="text-accent/50">[</span>
-                    {club.toLowerCase().replace(/\s+/g, "_")}
-                    <span className="text-accent/50">]</span>
-                  </span>
-                ))}
-              </div>
+          <div className="mt-4 flex items-center gap-2">
+            {founder.startup_logo_url && (
+              <StartupLogo src={founder.startup_logo_url} alt={founder.startup_name} size="md" />
             )}
-
-            {founder.bio && (
-              <p className="text-secondary text-[12px] leading-relaxed">
-                {renderBioWithLinks(founder.bio)}
-              </p>
-            )}
-
-            <div className="flex flex-wrap items-center gap-4 text-[11px] text-muted">
+            {founder.startup_url ? (
               <a
-                href={`mailto:${founder.email}`}
-                className="text-secondary hover:text-accent transition-colors inline-flex items-center gap-1"
+                href={founder.startup_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium hover:underline underline-offset-2 inline-flex items-center gap-1"
               >
-                {founder.email} <EnvelopeSimpleIcon size={12} />
+                {founder.startup_name}
+                <LinkSimpleIcon size={12} className="text-muted" />
               </a>
-              {founder.portfolio_url && (
-                <a
-                  href={founder.portfolio_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
+            ) : (
+              <span className="text-sm font-medium">{founder.startup_name}</span>
+            )}
+          </div>
+
+          {clubs.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {clubs.map((club) => (
+                <span
+                  key={club}
+                  className="text-xs px-2 py-0.5 rounded-full border border-border text-secondary"
                 >
-                  Portfolio <LinkSimpleIcon size={12} />
-                </a>
-              )}
-              {founder.linkedin_url && (
-                <a
-                  href={founder.linkedin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
-                >
-                  LinkedIn <LinkSimpleIcon size={12} />
-                </a>
-              )}
-              {founder.github_url && (
-                <a
-                  href={founder.github_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-accent transition-colors inline-flex items-center gap-1"
-                >
-                  GitHub <LinkSimpleIcon size={12} />
-                </a>
-              )}
+                  {club}
+                </span>
+              ))}
             </div>
+          )}
+
+          {founder.bio && (
+            <p className="mt-4 text-secondary text-sm leading-relaxed">
+              {renderBio(founder.bio)}
+            </p>
+          )}
+
+          <div className="mt-5 pt-5 border-t border-border flex flex-wrap gap-4 text-sm text-secondary">
+            <a
+              href={`mailto:${founder.email}`}
+              className="hover:text-foreground transition-colors hover:underline underline-offset-2"
+            >
+              {founder.email}
+            </a>
+            {founder.portfolio_url && (
+              <a
+                href={founder.portfolio_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors hover:underline underline-offset-2"
+              >
+                portfolio
+              </a>
+            )}
+            {founder.linkedin_url && (
+              <a
+                href={founder.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors hover:underline underline-offset-2"
+              >
+                linkedin
+              </a>
+            )}
+            {founder.github_url && (
+              <a
+                href={founder.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors hover:underline underline-offset-2"
+              >
+                github
+              </a>
+            )}
           </div>
         </div>
       </div>

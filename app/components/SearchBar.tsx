@@ -12,7 +12,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
 
   return (
     <div
-      className="flex items-center border border-border bg-surface px-4 py-2.5 cursor-text focus-within:border-accent transition-colors"
+      className="search-wrap relative cursor-text pb-2"
       onClick={() => inputRef.current?.focus()}
     >
       <input
@@ -20,11 +20,13 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="name, college, startup..."
-        className="flex-1 bg-transparent text-foreground text-[12px] placeholder:text-muted/50 border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+        placeholder="search members..."
+        className="w-full bg-transparent text-foreground text-sm placeholder:text-muted border-0 outline-none"
         spellCheck={false}
         autoComplete="off"
       />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-border" />
+      <div className="search-line" />
     </div>
   );
 }

@@ -1,43 +1,63 @@
 "use client";
 
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+
+gsap.registerPlugin(useGSAP);
+
 interface HeaderProps {
   founderCount: number;
-  onHomeClick?: () => void;
 }
 
-export default function Header({ founderCount, onHomeClick }: HeaderProps) {
-  return (
-    <header className="px-6 py-5 md:px-10">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <div className="text-left">
-            {onHomeClick ? (
-              <button
-                onClick={onHomeClick}
-                className="text-base md:text-lg font-bold tracking-tight text-foreground hover:text-accent transition-colors"
-              >
-                bos.network
-              </button>
-            ) : (
-              <h1 className="text-base md:text-lg font-bold tracking-tight text-foreground">
-                bos.network
-              </h1>
-            )}
-          </div>
-          <p className="text-muted text-[11px] tracking-wide">
-            {founderCount} founders
-          </p>
-        </div>
+export default function Header({ founderCount }: HeaderProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLSpanElement>(null);
 
-        <nav className="flex items-center gap-4">
-          <a
-            href="/form"
-            className="text-[11px] tracking-wide text-secondary hover:text-accent transition-colors"
-          >
-            Request access
-          </a>
-        </nav>
-      </div>
-    </header>
+  useGSAP(
+    () => {
+      if (!counterRef.current) return;
+      const obj = { value: 0 };
+      gsap.to(obj, {
+        value: founderCount,
+        duration: 1.2,
+        ease: "power3.out",
+        delay: 0.2,
+        snap: { value: 1 },
+        onUpdate() {
+          if (counterRef.current) {
+            counterRef.current.textContent = String(Math.round(obj.value));
+          }
+        },
+      });
+    },
+    { scope: containerRef }
+  );
+
+  return (
+    <div ref={containerRef}>
+      <h1 className="text-4xl font-semibold tracking-tight text-foreground">
+        bos.network
+      </h1>
+      <p className="mt-3 text-secondary text-sm leading-relaxed max-w-sm">
+        the official directory for startup founders from boston &amp; cambridge —
+        mit, harvard, northeastern, bu, tufts, and bc.
+      </p>
+      <p className="mt-3 text-secondary text-sm">
+        want to join?{" "}
+        <a
+          href="/form"
+          className="underline underline-offset-2 text-foreground hover:text-secondary transition-colors"
+        >
+          request access
+        </a>
+      </p>
+      <p className="mt-5 text-muted text-sm">
+        <span ref={counterRef} className="text-foreground font-medium tabular-nums">
+          0
+        </span>{" "}
+        founders
+      </p>
+    </div>
   );
 }
